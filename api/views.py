@@ -68,7 +68,7 @@ class PushSendToSI(generics.ListCreateAPIView):
             "data": [
                 {
                     "id": int(dealId),
-                    "SI_Project_ID": response.get("ProjectId"),
+                    "dtoolsforzohocrm_D_tools_Project_Id": response.get("ProjectId"),
                 }
             ]
         })

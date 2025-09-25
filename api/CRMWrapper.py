@@ -22,7 +22,7 @@ class CRMWrapper:
             dict: Response from Zoho CRM API
         """
         self._headers["Authorization"] = f"Zoho-oauthtoken {self._gen_crm_token()}"
-        response = requests.post(f'{self.url}{dealId}', json=data, headers=self._headers)
+        response = requests.patch(f'{self.url}{dealId}', json=data, headers=self._headers)
         return response.json()
     
     def _gen_crm_token(self) -> str:
@@ -33,7 +33,7 @@ class CRMWrapper:
             str: access token
         """
         load_dotenv()
-        base_url_access = f"https://accounts.zoho.com/oauth/v2/token?client_id={os.getenv("CRM_ID")}&client_secret={os.getenv("CRM_SECRET")}&grant_type=client_credentials&scope=ZohoCRM.modules.deals.ALL,ZohoCRM.modules.accounts.ALL,ZohoCRM.org.ALL&soid={os.getenv("CRM_SOID")}"
+        base_url_access = f"https://accounts.zoho.com/oauth/v2/token?client_id={os.getenv("CRM_ID")}&client_secret={os.getenv("CRM_SECRET")}&grant_type=client_credentials&scope=ZohoCRM.modules.deals.ALL,ZohoCRM.modules.accounts.ALL,ZohoCRM.org.ALL&soid=ZohoCRM.{os.getenv("CRM_SOID")}"
         response = requests.post(base_url_access)
-
+        
         return response.json().get("access_token")
