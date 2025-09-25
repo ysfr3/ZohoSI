@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .SIWrapper import SIWrapper
+from .CRMWrapper import CRMWrapper
 from .models import SendToSI
 from .serializers import StringBoolSerializer
 
@@ -37,8 +38,9 @@ class PushSendToSI(generics.ListCreateAPIView):
 
         load_dotenv()
         token = os.getenv("SI_TOKEN")
-        conn = SIWrapper(token=token)
-        res = conn.create_project(data={
+        SIConnection = SIWrapper(token=token)
+
+        res = SIConnection.create_project(data={
             "Client": serialized_data.get("Account_Name"),
             "Name": serialized_data.get("Deal_Name"),
             "Progress": serialized_data.get("Progress"),
@@ -57,8 +59,22 @@ class PushSendToSI(generics.ListCreateAPIView):
             serialized_data (dict): Data from serializer POST request
             response (dict): Response from SI API
         """
+        
+        load_dotenv()
+        CRMConnection = CRMWrapper(token=os.getenv("CRM_TOKEN"))
+        dealId = serialized_data.get("Deal_ID")
 
-        pass
+        res = CRMConnection.push_new_deal_data(dealId=dealId, data={
+            "data": [
+                {
+                    "id": int(dealId),
+                    "SI_Project_ID": response.get("ProjectId"),
+                }
+            ]
+        })
+
+        print(res)
+
 
 class PullSendToSI(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]

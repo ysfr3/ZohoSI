@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-p824ka$sba6)&6*%-5!f&g7jv$9s)%6!j0bu*-uqsh$xp=17!+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.10.139", "3c8c8194a755.ngrok-free.app", "appsail-10105758434.development.catalystappsail.com"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "45.55.69.1", "129.212.146.35"]
 
 # Application definition
 
