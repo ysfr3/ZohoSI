@@ -6,8 +6,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .SIWrapper import SIWrapper
 from .CRMWrapper import CRMWrapper
-from .models import SendToSI
-from .serializers import StringBoolSerializer
+from .models import SendToSI, SendToCRM
+from .serializers import StringBoolSerializer, CRMSerializer
 
 class PushSendToSI(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -80,3 +80,44 @@ class PullSendToSI(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SendToSI.objects.all()
     serializer_class = StringBoolSerializer
+
+class PushSendToCRM(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = SendToCRM.objects.all()
+    serializer_class = CRMSerializer
+
+    def perform_create(self, serializer):
+        """
+        Override perform_create to send data to CRM after saving to DB
+
+        Args:
+            serializer (Django Serializer): Django Rest Framework Serializer
+        """
+
+        serializer.save()
+        print(serializer.validated_data)
+        self.updateCRM(serializer.validated_data)
+        
+    def updateCRM(self, serialized_data: dict):
+        """
+        Update CRM with response from SI
+
+        Args:
+            serialized_data (dict): Data from serializer POST request
+            response (dict): Response from SI API
+        """
+        
+        load_dotenv()
+        CRMConnection = CRMWrapper(token=os.getenv("CRM_TOKEN"))
+        dealId = serialized_data.get("Deal_ID")
+
+        res = CRMConnection.push_new_deal_data(dealId=dealId, data={
+            "data": [
+                {
+                    "id": int(dealId),
+                    
+                }
+            ]
+        })
+
+        print(res)
