@@ -9,6 +9,17 @@ from .CRMWrapper import CRMWrapper
 from .models import SendToSI, SendToCRM
 from .serializers import StringBoolSerializer, CRMSerializer
 
+kFIELDS = [
+    "Price",
+    "Notes",
+    "Revision",
+    "Hours",
+    #"ProductCost",
+    #"ProductPrice",
+    #"LaborCost",
+    #"LaborPrice",
+]
+
 class PushSendToSI(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SendToSI.objects.all()
@@ -75,7 +86,6 @@ class PushSendToSI(generics.ListCreateAPIView):
 
         print(res)
 
-
 class PullSendToSI(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SendToSI.objects.all()
@@ -97,6 +107,16 @@ class PushSendToCRM(generics.ListCreateAPIView):
         serializer.save()
         print(serializer.validated_data)
         self.updateCRM(serializer.validated_data)
+
+        SI_API = SIWrapper(token=os.getenv("SI_TOKEN"))
+
+        if serializer.validated_data.get("Type") == "Update" and serializer.validated_data.get("Ids") != []:
+            for id in serializer.validated_data.get("Ids"):
+                project = SI_API.get_project(project_id=id)
+                print(project)
+                for field in kFIELDS:
+                    if field in project:
+                        print(field)
         
     def updateCRM(self, serialized_data: dict):
         """

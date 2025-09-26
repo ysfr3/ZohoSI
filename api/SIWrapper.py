@@ -12,3 +12,7 @@ class SIWrapper:
     def create_project(self, data: dict) -> dict:
         response = requests.post(f'{self.url}Publish/Projects', json=data, headers=self._headers)
         return response.json()
+    
+    def get_project(self, project_id: int) -> dict:
+        response = requests.get(f'{self.url}Subscribe/Projects?id={project_id}', headers=self._headers)
+        return response.json()

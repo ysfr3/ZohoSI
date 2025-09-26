@@ -16,14 +16,9 @@ class SendToSI(models.Model):
     
 class SendToCRM(models.Model):
     # Fields
-    Equipment_Rev = models.JSONField()
-    Cost = models.JSONField()
-    Expected_Revenue = models.JSONField()
-    Labor_Cost = models.JSONField()
-    Labor_Revenue = models.JSONField()
-    Labor_Hours = models.JSONField()
+    Data = models.JSONField()
 
-    AllFields = [Equipment_Rev, Cost, Expected_Revenue, Labor_Cost, Labor_Revenue, Labor_Hours]
+    AllFields = [Data]
 
     def __str__(self):
         return str(self.AllFields)
