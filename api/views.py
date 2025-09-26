@@ -61,7 +61,7 @@ class PushSendToSI(generics.ListCreateAPIView):
         """
         
         load_dotenv()
-        CRMConnection = CRMWrapper(token=os.getenv("CRM_TOKEN"))
+        CRMConnection = CRMWrapper()
         dealId = serialized_data.get("Deal_ID")
 
         res = CRMConnection.push_new_deal_data(dealId=dealId, data={
