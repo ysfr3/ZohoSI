@@ -25,6 +25,18 @@ class CRMWrapper:
         response = requests.patch(f'{self.url}{dealId}', json=data, headers=self._headers)
         return response.json()
     
+    def get_deal(self, dealId: int) -> dict:
+        """
+        Get deal from Zoho CRM
+
+        Args:
+            dealId (int): dealId of deal to get
+        """
+        self._headers["Authorization"] = f"Zoho-oauthtoken {self._gen_crm_token()}"
+        response = requests.get(f'{self.url}{dealId}', headers=self._headers)
+        return response.json()
+
+    
     def _gen_crm_token(self) -> str:
         """
         Get new CRM token from Zoho
