@@ -36,7 +36,6 @@ class CRMWrapper:
         response = requests.get(f'{self.url}{dealId}', headers=self._headers)
         return response.json()
 
-    
     def _gen_crm_token(self) -> str:
         """
         Get new CRM token from Zoho
