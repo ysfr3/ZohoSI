@@ -16,9 +16,11 @@ class SendToSI(models.Model):
     
 class SendToCRM(models.Model):
     # Fields
-    Data = models.JSONField()
-
-    AllFields = [Data]
+    ApiKey = models.CharField(max_length=255)
+    Type = models.CharField(max_length=50)
+    Module = models.CharField(max_length=50)
+    Ids = models.JSONField()
+    UpdatedOn = models.CharField(max_length=50)
 
     def __str__(self):
-        return str(self.AllFields)
+        return f"{self.Module} - {self.Type} - {self.UpdatedOn}"
