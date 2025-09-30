@@ -126,7 +126,7 @@ class PushSendToCRM(generics.ListCreateAPIView):
         CRMConnection = CRMWrapper(token=os.getenv("CRM_TOKEN"))
         dealId = serialized_data.get("IntegrationProjectId")
         print(dealId)
-        res = CRMConnection.push_new_deal_data(dealId=dealId, data={
+        res = CRMConnection.push_new_deal_data(dealId=int(dealId), data={
             "data": [
                 {
                     "id": int(dealId),

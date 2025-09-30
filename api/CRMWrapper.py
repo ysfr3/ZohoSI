@@ -53,12 +53,17 @@ class CRMWrapper:
         """
         Test function to check if CRMWrapper is working
         """
-        response = self.push_new_deal_data(dealId=1234567890, data={
+        response = self.push_new_deal_data(dealId=4058769000080485087, data={
             "data": [
                 {
-                    "id": 4058769000083514084,
-                    "dtoolsforzohocrm_D_tools_Project_Id": "TEST",
+                    "id": 4058769000080485087,
+                    "Labor_Hours": 10,
+                    "Amount": 1500
                 }
             ]
         })
-        print(response.json())
+        print(response)
+
+if __name__ == "__main__":
+    crm = CRMWrapper()
+    crm._test()
