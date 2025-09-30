@@ -48,3 +48,17 @@ class CRMWrapper:
         response = requests.post(base_url_access)
         
         return response.json().get("access_token")
+    
+    def _test(self):
+        """
+        Test function to check if CRMWrapper is working
+        """
+        response = self.push_new_deal_data(dealId=1234567890, data={
+            "data": [
+                {
+                    "id": 4058769000083514084,
+                    "dtoolsforzohocrm_D_tools_Project_Id": "TEST",
+                }
+            ]
+        })
+        print(response.json())

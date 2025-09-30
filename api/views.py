@@ -14,10 +14,6 @@ kFIELDS = [
     "Notes",
     "Revision",
     "Hours",
-    #"ProductCost",
-    #"ProductPrice",
-    #"LaborCost",
-    #"LaborPrice",
 ]
 
 class PushSendToSI(generics.ListCreateAPIView):
@@ -108,20 +104,16 @@ class PushSendToCRM(generics.ListCreateAPIView):
         """
 
         serializer.save()
-        print(serializer.validated_data)
-        self.updateCRM(serializer.validated_data)
 
+        load_dotenv()
         SI_API = SIWrapper(token=os.getenv("SI_TOKEN"))
-
-        if serializer.validated_data.get("Type") == "Update" and serializer.validated_data.get("Ids") != []:
+        if serializer.validated_data.get("Type") == "Update":
             for id in serializer.validated_data.get("Ids"):
                 project = SI_API.get_project(project_id=id)
                 print(project)
-                for field in kFIELDS:
-                    if field in project:
-                        print(field)
-        
-    def updateCRM(self, serialized_data: dict):
+                self.updateCRM(serializer.validated_data, project)
+
+    def updateCRM(self, serialized_data: dict, project_data: dict):
         """
         Update CRM with response from SI
 
@@ -129,16 +121,17 @@ class PushSendToCRM(generics.ListCreateAPIView):
             serialized_data (dict): Data from serializer POST request
             response (dict): Response from SI API
         """
-        
+        print("updating crm")
         load_dotenv()
         CRMConnection = CRMWrapper(token=os.getenv("CRM_TOKEN"))
-        dealId = serialized_data.get("Deal_ID")
-
+        dealId = serialized_data.get("IntegrationProjectId")
+        print(dealId)
         res = CRMConnection.push_new_deal_data(dealId=dealId, data={
             "data": [
                 {
                     "id": int(dealId),
-                    
+                    "Amount": float(project_data.get("Price")),
+                    "Labor_Hours": float(project_data.get("Hours"))
                 }
             ]
         })

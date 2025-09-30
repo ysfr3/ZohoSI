@@ -24,3 +24,4 @@ class SendToCRM(models.Model):
 
     def __str__(self):
         return f"{self.Module} - {self.Type} - {self.UpdatedOn}"
+    
