@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from django.shortcuts import render
 
 from dotenv import load_dotenv
@@ -126,6 +127,9 @@ class PushSendToCRM(generics.ListCreateAPIView):
         CRMConnection = CRMWrapper()
         dealId = project_data.get("IntegrationProjectId")
 
+        note_content = f"[DEAL UPDATED FROM SI] - Updated On: {str(datetime.now())} - Updated By: {project_data.get("UpdatedBy")}"
+        res = CRMConnection.add_note(dealId=int(dealId), note_content=note_content)
+
         if project_data.get("IsChangeOrder") == "True":
             note_content = f"[Change Order - {project_data.get("CONumber")}] Name: {project_data.get("COName")} | Status: {project_data.get("COStatus")} | Type: {project_data.get("COType")} | Accepted: {project_data.get("COAcceptedOn")} | Rejected: {project_data.get("CORejectedOn")} | Created On: {project_data.get("COCreatedOn")}"
             res = CRMConnection.add_note(dealId=int(dealId), note_content=note_content)
@@ -135,7 +139,9 @@ class PushSendToCRM(generics.ListCreateAPIView):
                 {
                     "id": int(dealId),
                     "Amount": float(project_data.get("Price")),
-                    "Labor_Hours": float(project_data.get("Hours"))
+                    "Labor_Hours": float(project_data.get("Hours")),
+                    "SI_Project_Created": "Yes",
+                    "Custom_Field01": project_data.get("CustomField1")
                 }
             ]
         })
