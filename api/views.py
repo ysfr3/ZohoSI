@@ -78,7 +78,7 @@ class PushSendToSI(generics.ListCreateAPIView):
             "data": [
                 {
                     "id": int(dealId),
-                    "dtoolsforzohocrm_D_tools_Project_Id": response.get("ProjectId"),
+                    "dtoolsforzohocrm__D_tools_Project_Id": response.get("ProjectId"),
                 }
             ]
         })
@@ -123,9 +123,13 @@ class PushSendToCRM(generics.ListCreateAPIView):
         """
         print("updating crm")
         load_dotenv()
-        CRMConnection = CRMWrapper(token=os.getenv("CRM_TOKEN"))
-        dealId = serialized_data.get("IntegrationProjectId")
-        print(dealId)
+        CRMConnection = CRMWrapper()
+        dealId = project_data.get("IntegrationProjectId")
+
+        if project_data.get("IsChangeOrder") == "True":
+            note_content = f"[Change Order - {project_data.get("CONumber")}] Name: {project_data.get("COName")} | Status: {project_data.get("COStatus")} | Type: {project_data.get("COType")} | Accepted: {project_data.get("COAcceptedOn")} | Rejected: {project_data.get("CORejectedOn")} | Created On: {project_data.get("COCreatedOn")}"
+            res = CRMConnection.add_note(dealId=int(dealId), note_content=note_content)
+
         res = CRMConnection.push_new_deal_data(dealId=int(dealId), data={
             "data": [
                 {
