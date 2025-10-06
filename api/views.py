@@ -10,13 +10,6 @@ from .CRMWrapper import CRMWrapper
 from .models import SendToSI, SendToCRM
 from .serializers import StringBoolSerializer, CRMSerializer
 
-kFIELDS = [
-    "Price",
-    "Notes",
-    "Revision",
-    "Hours",
-]
-
 class PushSendToSI(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = SendToSI.objects.all()
@@ -137,17 +130,17 @@ class PushSendToCRM(generics.ListCreateAPIView):
         res = CRMConnection.push_new_deal_data(dealId=int(dealId), data={
             "data": [
                 {
-                    "id": int(dealId),
-                    "Amount": float(project_data.get("Price")),
-                    "Labor_Hours": float(project_data.get("Hours")),
+                    "id":                 int(dealId),
+                    "Amount":             float(project_data.get("Price")),
+                    "Labor_Hours":        float(project_data.get("Hours")),
                     "SI_Project_Created": "Yes",
-                    "Revision_Number": project_data.get("Revision"),
-                    "CO_Number": project_data.get("CONumber"),
-                    "Custom_Field01": project_data.get("CustomField1"),
-                    "Custom_Field02": project_data.get("CustomField2"),
-                    "Custom_Field03": project_data.get("CustomField3"),
-                    "Custom_Field04": project_data.get("CustomField4"),
-                    "Custom_Field05": project_data.get("CustomField5")
+                    "Revision_Number":    str(project_data.get("Revision")),
+                    "CO_Number":          str(project_data.get("CONumber")),
+                    "Custom_Field01":     project_data.get("CustomField1"),
+                    "Custom_Field02":     project_data.get("CustomField2"),
+                    "Custom_Field03":     project_data.get("CustomField3"),
+                    "Custom_Field04":     project_data.get("CustomField4"),
+                    "Custom_Field05":     project_data.get("CustomField5")
                 }
             ]
         })
