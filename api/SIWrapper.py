@@ -1,11 +1,17 @@
 import requests
+import os
+import json
+from dotenv import load_dotenv
 
 class SIWrapper:
-    def __init__(self, token: str, base_url: str = 'https://api.d-tools.com/SI/'):
+    def __init__(self, base_url: str = 'https://api.d-tools.com/SI/'):
         self.url = base_url if base_url.endswith('/') else f'{base_url}/'
-        self.token = token
+        load_dotenv()
+        _token = os.getenv("SI_TOKEN")
+        if _token is None:
+            raise ValueError("SI TOKEN NOT SET")
         self._headers = {
-            "X-DTSI-ApiKey": self.token,
+            "X-DTSI-ApiKey": _token,
             "Content-Type": "application/json"
         }
 
@@ -13,6 +19,28 @@ class SIWrapper:
         response = requests.post(f'{self.url}Publish/Projects', json=data, headers=self._headers)
         return response.json()
     
-    def get_project(self, project_id: int) -> dict:
-        response = requests.get(f'{self.url}Subscribe/Projects?id={project_id}', headers=self._headers)
+    def get_project(self, project_id: str, co_number: int = None) -> dict:
+        project_co = self.get_project_current_co(project_id)
+        fdurl = (f'{self.url}Subscribe/Projects?id={project_id}&coNumber={project_co}') if project_co is not None else (f'{self.url}Subscribe/Projects?id={project_id}')
+
+        response = requests.get(fdurl, headers=self._headers)
         return response.json()
+    
+    def get_project_current_co(self, project_id: str) -> int:
+        project_list = self.get_project_list()
+        
+        for i, project in enumerate(project_list):
+            if project.get("Id") == project_id:
+                project_object = project_list[i]
+        
+        return project_object.get("CONumber")
+    
+    def get_project_list(self) -> dict:
+        response = requests.get(f'{self.url}Subscribe/Projects', headers=self._headers)
+        return response.json().get("Projects")
+    
+if __name__=="__main__":
+    si = SIWrapper()
+
+    with open("out.json", "w") as f:
+        f.write(json.dumps((si.get_project("8f7281c0-4ee3-4ead-a9b9-e291f47fb77d"))))

@@ -37,9 +37,7 @@ class PushSendToSI(generics.ListCreateAPIView):
             response (dict): Response from SI API
         """
 
-        load_dotenv()
-        token = os.getenv("SI_TOKEN")
-        SIConnection = SIWrapper(token=token)
+        SIConnection = SIWrapper()
 
         res = SIConnection.create_project(data={
             "Client": serialized_data.get("Account_Name"),
@@ -99,10 +97,10 @@ class PushSendToCRM(generics.ListCreateAPIView):
 
         serializer.save()
 
-        load_dotenv()
-        SI_API = SIWrapper(token=os.getenv("SI_TOKEN"))
+        SI_API = SIWrapper()
         if serializer.validated_data.get("Type") == "Update":
             for id in serializer.validated_data.get("Ids"):
+                
                 project = SI_API.get_project(project_id=id)
                 print(project)
                 self.updateCRM(serializer.validated_data, project)
