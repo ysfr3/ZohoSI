@@ -1,7 +1,5 @@
 # Zoho ↔ D-Tools SI Integration (ZohoSI)
 
-## Repository layout
-
 - `manage.py`
 - `db.sqlite3`
 - `requirements.txt`
