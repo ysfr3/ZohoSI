@@ -1,3 +1,17 @@
+# =============================================================================
+# SQLDriver.py
+# Author: Aidan Lelliott
+# Organization: ASW
+# Date: 10/08/2025
+# Version: 1.0.0
+#
+# Description:
+#   SQL Server connection driver for Python. Handles connection and query
+#   execution using environment variables for credentials.
+#
+# License: Proprietary - For internal use only. Do not distribute.
+# =============================================================================
+
 from os import getenv
 from dotenv import load_dotenv
 from pymssql import connect, Cursor

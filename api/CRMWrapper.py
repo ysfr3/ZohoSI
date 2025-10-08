@@ -1,3 +1,17 @@
+# =============================================================================
+# CRMWrapper.py
+# Author: Aidan Lelliott
+# Organization: ASW
+# Date: 10/08/2025
+# Version: 1.0.0
+#
+# Description:
+#   Python wrapper for Zoho CRM API. Provides methods for deal creation,
+#   updating, note addition, and retrieval via RESTful endpoints.
+#
+# License: Proprietary - For internal use only. Do not distribute.
+# =============================================================================
+
 import os
 import requests
 from dotenv import load_dotenv

@@ -1,3 +1,17 @@
+# =============================================================================
+# SIWrapper.py
+# Author: Aidan Lelliott
+# Organization: ASW
+# Date: 10/08/2025
+# Version: 1.0.0
+#
+# Description:
+#   Python wrapper for D-Tools SI API. Provides methods for project creation,
+#   retrieval, and listing via RESTful endpoints.
+#
+# License: Proprietary - For internal use only. Do not distribute.
+# =============================================================================
+
 import requests
 import os
 import json
