@@ -1,17 +1,5 @@
 # Zoho ↔ D-Tools SI Integration (ZohoSI)
 
-Comprehensive Django + Django REST Framework project that integrates Zoho CRM with D-Tools SI (System Integrator). This repository provides API endpoints, database models, and wrapper clients to coordinate creation and synchronization of deals/projects between Zoho CRM and D-Tools SI.
-
-## Purpose
-
-This service acts as an integration layer that:
-
-- Accepts inbound requests (via DRF endpoints) to push CRM Deal data into D-Tools SI as projects.
-- Receives or polls updates from D-Tools SI and applies those updates back to Zoho CRM (field updates and notes).
-- Persists requests/operations in a simple SQLite-backed database for audit, retry, and administrative inspection.
-
-The design aims for clarity and ease-of-maintenance rather than heavy abstraction. Wrapper classes isolate external API details so the core logic in views stays concise.
-
 ## Repository layout
 
 - `manage.py`
