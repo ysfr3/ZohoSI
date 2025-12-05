@@ -18,6 +18,10 @@ from django.shortcuts import render
 from dotenv import load_dotenv
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+import time
 from .SIWrapper import SIWrapper
 from .CRMWrapper import CRMWrapper
 from .models import SendToSI, SendToCRM
@@ -157,3 +161,42 @@ class PushSendToCRM(generics.ListCreateAPIView):
         })
 
         print(res)
+
+
+# Simple delay endpoint for testing/diagnostics
+@api_view(['GET'])
+def delay(request, seconds: int = None):
+    """Delay the response for `seconds` seconds and return HTTP 200.
+
+    Accepts the delay value either as a path parameter (e.g. /api/delay/5/) or
+    as a query parameter `seconds` (e.g. /api/delay/?seconds=5). Also handles
+    query strings like `?5` by inspecting the raw query string.
+    """
+    # Determine seconds from path param or query string
+    s = None
+    if seconds is not None:
+        s = seconds
+    else:
+        # Prefer explicit `seconds` query parameter
+        if 'seconds' in request.GET:
+            s = request.GET.get('seconds')
+        else:
+            # Fallback: handle query like `?5` where QUERY_STRING == '5'
+            qsraw = request.META.get('QUERY_STRING', '')
+            if qsraw.isdigit():
+                s = qsraw
+
+    try:
+        if s is None or s == '':
+            secs = 0
+        else:
+            secs = int(s)
+            if secs < 0:
+                raise ValueError("seconds must be non-negative")
+    except (TypeError, ValueError):
+        return Response({"detail": "Invalid seconds value"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Perform the delay
+    time.sleep(secs)
+
+    return Response(status=status.HTTP_200_OK)
