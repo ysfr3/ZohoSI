@@ -89,6 +89,8 @@ class CRMWrapper:
             str: access token
         """
         load_dotenv()
+        print(os.getenv("CRM_ID"))
+        print(os.getenv("CRM_SECRET"))
         base_url_access = f"https://accounts.zoho.com/oauth/v2/token?client_id={os.getenv("CRM_ID")}&client_secret={os.getenv("CRM_SECRET")}&grant_type=client_credentials&scope=ZohoCRM.modules.deals.ALL,ZohoCRM.modules.accounts.ALL,ZohoCRM.org.ALL,ZohoCRM.modules.notes.CREATE&soid=ZohoCRM.{os.getenv("CRM_SOID")}"
         response = requests.post(base_url_access)
         
@@ -98,4 +100,9 @@ class CRMWrapper:
         """
         Test function to check if CRMWrapper is working
         """
-        pass
+        token = self._gen_crm_token()
+        print(token)
+
+if __name__=="__main__":
+    CRM = CRMWrapper()
+    CRM._test()

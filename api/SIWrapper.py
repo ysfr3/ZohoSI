@@ -21,9 +21,10 @@ class SIWrapper:
     def __init__(self, base_url: str = 'https://api.d-tools.com/SI/'):
         self.url = base_url if base_url.endswith('/') else f'{base_url}/'
         load_dotenv()
-        _token = os.getenv("SI_TOKEN")
+        _token = "fjQETBKaLEiP1+T66NFhlA265dOZbaGkOn+yAOpobvJQ"
         if _token is None:
             raise ValueError("SI TOKEN NOT SET")
+        print(_token)
         self._headers = {
             "X-DTSI-ApiKey": _token,
             "Content-Type": "application/json"
@@ -52,9 +53,3 @@ class SIWrapper:
     def get_project_list(self) -> dict:
         response = requests.get(f'{self.url}Subscribe/Projects', headers=self._headers)
         return response.json().get("Projects")
-    
-if __name__=="__main__":
-    si = SIWrapper()
-
-    with open("out.json", "w") as f:
-        f.write(json.dumps((si.get_project("8f7281c0-4ee3-4ead-a9b9-e291f47fb77d"))))
