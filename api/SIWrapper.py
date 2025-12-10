@@ -21,7 +21,7 @@ class SIWrapper:
     def __init__(self, base_url: str = 'https://api.d-tools.com/SI/'):
         self.url = base_url if base_url.endswith('/') else f'{base_url}/'
         load_dotenv()
-        _token = "fjQETBKaLEiP1+T66NFhlA265dOZbaGkOn+yAOpobvJQ"
+        _token = os.getenv("SI_TOKEN")
         if _token is None:
             raise ValueError("SI TOKEN NOT SET")
         print(_token)
