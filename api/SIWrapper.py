@@ -35,7 +35,9 @@ class SIWrapper:
         return response.json()
     
     def get_project(self, project_id: str, co_number: int = None) -> dict:
-        project_co = self.get_project_current_co(project_id)
+        project_co = None
+        if co_number != None:
+            project_co = self.get_project_current_co(project_id)
         fdurl = (f'{self.url}Subscribe/Projects?id={project_id}&coNumber={project_co}') if project_co is not None else (f'{self.url}Subscribe/Projects?id={project_id}')
 
         response = requests.get(fdurl, headers=self._headers)
@@ -53,3 +55,8 @@ class SIWrapper:
     def get_project_list(self) -> dict:
         response = requests.get(f'{self.url}Subscribe/Projects', headers=self._headers)
         return response.json().get("Projects")
+
+#if __name__=="__main__":
+    #wrapper = SIWrapper()
+    #project = wrapper.get_project("")
+    #print(project)
