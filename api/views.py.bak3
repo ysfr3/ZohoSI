@@ -56,29 +56,12 @@ class PushSendToSI(generics.ListCreateAPIView):
 
         SIConnection = SIWrapper()
 
-        serializedTemplate = serialized_data.get("SI_Template")
-        if serializedTemplate is not None or serializedTemplate != "None":
-            passedTemplate = serializedTemplate
-        else:
-            passedTemplate = None
-
-        print("0-----------------------------------------0")
-        print(serializedTemplate)
-        print(passedTemplate)
-        print("0-----------------------------------------0")
-
-
         res = SIConnection.create_project(data={
-            "TemplateName": passedTemplate,
             "Client": serialized_data.get("Account_Name"),
             "Name": serialized_data.get("Deal_Name"),
             "Progress": serialized_data.get("Progress"),
             "IntegrationProjectId": serialized_data.get("Deal_ID"),
             "Number": serialized_data.get("Mission_ID"),
-            "SalesRep": serialized_data.get("Owner"),
-            "ProjectManager": serialized_data.get("Project_Manager"),
-            "Designer": serialized_data.get("Engineering_Lead"),
-            "CloseDate": serialized_data.get("Closing_Date"),
         })
 
         print(res)
