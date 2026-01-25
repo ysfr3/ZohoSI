@@ -1,8 +1,8 @@
 # =============================================================================
 # views.py
-# Author: Aidan Lelliott and Jason Owens
+# Author: Aidan Lelliott
 # Organization: ASW
-# Date: 01/19/2026
+# Date: 10/08/2025
 # Version: 1.0.0
 #
 # Description:
@@ -22,7 +22,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import time
-import json
 from .SIWrapper import SIWrapper
 from .CRMWrapper import CRMWrapper
 from .models import SendToSI, SendToCRM
@@ -138,8 +137,6 @@ class PushSendToCRM(generics.ListCreateAPIView):
             for id in serializer.validated_data.get("Ids"):
                 
                 project = SI_API.get_project(project_id=id)
-                with open(f"project_{id}.json", "w") as f:
-                    f.write(json.dumps(project))
                 print(project)
                 self.updateCRM(serializer.validated_data, project)
 
@@ -156,101 +153,12 @@ class PushSendToCRM(generics.ListCreateAPIView):
         CRMConnection = CRMWrapper()
         dealId = project_data.get("IntegrationProjectId")
 
-        # Initialize labor totals
-        techFinalizedLaborHours = 0
-        engineeringPostFinalizedLaborHours = 0
-        engineeringPreFinalizedLaborHours = 0
-        programmingFinalizedLaborHours = 0
-        projectManagmentFinalizedLaborHours = 0
-        warrantyFinalizedLaborHours = 0
-        unassignedFinalizedLaborHours = 0
-        travelTimeFinalizedLaborHours = 0
-        #travelExpenseFinalizedLaborHours = 0
-
-        # LOOP HERE
-        items = project_data.get("Items", [])
-
-        for each_item in items:
-            labor_type = each_item.get("LaborType")
-            labor_category = None
-            hours = 0
-
-            # HARD STOP: exclude items with LaborType = None
-            if labor_type is None:
-                print(
-                    f"[SKIP] LaborType=None excluded | "
-                    f"Id={each_item.get('Id')} | "
-                    f"LaborTypes={each_item.get('LaborTypes')} | "
-                    f"Hours={each_item.get('TotalLaborHours')}"
-                )
-                continue
-
-            # RULE 1: Phase → use Model + Quantity
-            if labor_type == "Phase":
-                labor_category = each_item.get("Model")
-                hours = each_item.get("Quantity") or 0
-
-            # RULE 2: Non-phase → use LaborTypes + TotalLaborHours
-            else:
-                labor_category = each_item.get("LaborTypes")
-                hours = each_item.get("TotalLaborHours") or 0
-
-            # Skip empty categories safely
-            if not labor_category:
-                continue
-
-            match labor_category:
-                case "Tech Labor":
-                    techFinalizedLaborHours += hours
-                case "Engineering (Post Sales)":
-                    engineeringPostFinalizedLaborHours += hours
-                case "Engineering (Pre-Sales)":
-                    engineeringPreFinalizedLaborHours += hours
-                case "Programming":
-                    programmingFinalizedLaborHours += hours
-                case "Project Management":
-                    projectManagmentFinalizedLaborHours += hours
-                case "Warranty":
-                    warrantyFinalizedLaborHours += hours
-                case "Unassigned":
-                    unassignedFinalizedLaborHours += hours
-                case "Travel (Time)":
-                    travelTimeFinalizedLaborHours += hours
-                #case "Travel (Expense)":
-                #    travelExpenseFinalizedLaborHours += hours
-
-                case _:
-                    print(f"[WARN] Unhandled labor category: {labor_category}")
-
-            # Debug per-item (optional, but useful)
-            print(
-                f"[DEBUG] LaborType={labor_type}, "
-                f"Category={labor_category}, "
-                f"Hours={hours}"
-            )
-
-
         note_content = f"[DEAL UPDATED FROM SI] - Updated On: {str(datetime.now())} - Updated By: {project_data.get("UpdatedBy")}"
         res = CRMConnection.add_note(dealId=int(dealId), note_content=note_content)
 
-        print("\n--- Final Labor Hour Totals ---")
-        print(f"Tech Labor:                 {techFinalizedLaborHours}")
-        print(f"Engineering (Post Sales):   {engineeringPostFinalizedLaborHours}")
-        print(f"Engineering (Pre-Sales):    {engineeringPreFinalizedLaborHours}")
-        print(f"Programming:                {programmingFinalizedLaborHours}")
-        print(f"Project Management:         {projectManagmentFinalizedLaborHours}")
-        print(f"Warranty:                   {warrantyFinalizedLaborHours}")
-        print(f"Unassigned:                 {unassignedFinalizedLaborHours}")
-        print(f"Travel Time:                {travelTimeFinalizedLaborHours}")
-        #print(f"Travel Expense:             {travelExpenseFinalizedLaborHours}")
-        #print(f"Warranty Quantity (in Phase): {warrantyQuantityFromPhase}")
-        print("--------------------------------\n")
-        print(
-            f"[DEBUG] LaborType={labor_type}, "
-            f"Category={labor_category}, "
-            f"Hours={hours}"
-        )
-
+        if project_data.get("IsChangeOrder") == "True":
+            note_content = f"[Change Order - {project_data.get("CONumber")}] Name: {project_data.get("COName")} | Status: {project_data.get("COStatus")} | Type: {project_data.get("COType")} | Accepted: {project_data.get("COAcceptedOn")} | Rejected: {project_data.get("CORejectedOn")} | Created On: {project_data.get("COCreatedOn")}"
+            res = CRMConnection.add_note(dealId=int(dealId), note_content=note_content)
 
         res = CRMConnection.push_new_deal_data(dealId=int(dealId), data={
             "data": [
@@ -265,17 +173,7 @@ class PushSendToCRM(generics.ListCreateAPIView):
                     "Custom_Field02":     project_data.get("CustomField2"),
                     "Custom_Field03":     project_data.get("CustomField3"),
                     "Custom_Field04":     project_data.get("CustomField4"),
-                    "Custom_Field05":     project_data.get("CustomField5"),
-                    # These fields need to be filtered and totaled from project items in SI. The get responses below are what they are named in SI
-                    "Unassigned_Hours": float(unassignedFinalizedLaborHours),
-                    "Tech_Labor_Hours": float(techFinalizedLaborHours),
-                    "Eng_Pre_Sales_Hours": float(engineeringPreFinalizedLaborHours),
-                    "Eng_Post_Sales_Hours": float(engineeringPostFinalizedLaborHours),
-                    "Programming_Hours": float(programmingFinalizedLaborHours),
-                    "PM_Hours": float(projectManagmentFinalizedLaborHours),
-                    "Travel_Time_Hours": float(travelTimeFinalizedLaborHours),
-                    #"Travel_Expense_Misc": float(travelExpenseFinalizedLaborHours),
-                    "Warranty_Hours": float(warrantyFinalizedLaborHours),
+                    "Custom_Field05":     project_data.get("CustomField5")
                 }
             ]
         })
