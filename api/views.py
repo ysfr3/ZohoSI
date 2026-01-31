@@ -256,7 +256,8 @@ class PushSendToCRM(generics.ListCreateAPIView):
             "data": [
                 {
                     "id":                 int(dealId),
-                    "Amount":             float(project_data.get("Price")),
+                    #"Amount":             float(project_data.get("Price")),
+                    "SI_Realtime_Amount": float(project_data.get("Price")),
                     "Labor_Hours":        float(project_data.get("Hours")),
                     "SI_Executed": "Yes",
                     "Revision_Number":    str(project_data.get("Revision")),
